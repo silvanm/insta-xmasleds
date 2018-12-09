@@ -11,10 +11,7 @@ from datetime import datetime, timedelta
 from PIL import Image, ImageFilter, ImageEnhance, ImageOps
 from io import BytesIO
 from collections import deque
-
 import platform
-import json
-
 import pytz
 import requests
 import dateparser
@@ -30,13 +27,13 @@ HEIGHT_TO_WIDTH = 3
 BLUR_PIXELS=2
 
 # Reduce saturation. 1 = no reduction
-COLOR_LEVEL=0.3
+COLOR_LEVEL=1
 
 # The number of rows the both images overlap
 OVERLAP_ROWS = 50
 
 # Max illumination
-MAX_LEVEL = 50
+MAX_LEVEL = 100
 
 # Imagedata
 images = deque()

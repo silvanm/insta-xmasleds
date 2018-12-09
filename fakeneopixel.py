@@ -1,4 +1,4 @@
-""" Simulates the NeoPixel as image """
+""" Simulates the NeoPixel as image for local debugging """
 
 from PIL import Image
 
