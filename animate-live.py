@@ -15,9 +15,13 @@ import platform
 import pytz
 import requests
 import dateparser
+from math import floor, ceil, sin, cos, pi
 
 # The number of NeoPixels
-NUM_PIXELS = 600
+NUM_PIXELS = 780
+
+# The number of Pixels to have black at the beginning
+BLACK_OFFSET = 170
 
 ANIMATION_DELAY = 0
 
@@ -73,9 +77,9 @@ class XmasImage():
     def __init__(self, bytes, name):
         self.name = name
         img = Image.open(BytesIO(bytes))
-        image = img.resize((NUM_PIXELS, NUM_PIXELS), resample=Image.BICUBIC)
+        image = img.resize((NUM_PIXELS - BLACK_OFFSET, NUM_PIXELS - BLACK_OFFSET), resample=Image.BICUBIC)
         image = image.filter(ImageFilter.GaussianBlur(radius=BLUR_PIXELS))
-        image = image.resize((NUM_PIXELS, HEIGHT_TO_WIDTH * NUM_PIXELS), resample=Image.BICUBIC)
+        image = image.resize((NUM_PIXELS - BLACK_OFFSET, HEIGHT_TO_WIDTH * NUM_PIXELS - BLACK_OFFSET), resample=Image.BICUBIC)
 
         # Desaturate
         converter = ImageEnhance.Color(image)
@@ -90,10 +94,11 @@ class XmasImage():
         return int(v / 255 * MAX_LEVEL)
 
     def get_row(self, y):
-        row = []
+        row = [(0, 0, 0)] * BLACK_OFFSET
         if y > self.image.size[1]:
             raise ("Requested row %d larger than image height %d" % (y, self.image.size[1]))
         else:
+
             for x in range(0, self.image.size[0]):
                 pixel = [self.max_level(self.gamma(p, gamma=0.6)) for p in self.image.getpixel((x, y))]
                 row.append(pixel)
@@ -221,7 +226,7 @@ def display_image():
             row = get_row_using_crossfade(y)
             for index, val in enumerate(row):
                 if index < NUM_PIXELS:
-                    if lights_on:
+                    if lights_on and index > BLACK_OFFSET:
                         pixels[index] = tuple(prevent_darkness(val))
                     else:
                         pixels[index] = (0, 0, 0)
@@ -231,15 +236,17 @@ def display_image():
 
 
 def test():
-    for i in range(0, MAX_LEVEL):
-        for x in range(0, NUM_PIXELS):
-            pixels[x] = (i, i, i)
+    log("Run test.")
+    for x in range(0, NUM_PIXELS):
+        pixels[x] = 0
 
-        print(i)
+    for x in range(BLACK_OFFSET, NUM_PIXELS):
+        i = x / 255 * pi * 5
+        level = x / NUM_PIXELS * 255
+        pixels[x] = (int((sin(i) + 1)/2 * level), int((cos(i * 2) + 1)/2 * level), int((sin(i * 3) + 1)/2 * level))
         pixels.show()
-        time.sleep(0.1)
 
-
+#while True:
 test()
 check_is_night_via_webservice()
 display_image()

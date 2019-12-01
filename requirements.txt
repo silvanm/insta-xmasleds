@@ -1,7 +1,7 @@
-Adafruit-Blinka==0.3.0
-adafruit-circuitpython-neopixel==3.3.4
-Adafruit-GPIO==1.0.3
-Adafruit-PureIO==0.2.3
+Adafruit-Blinka>=0.3.0
+adafruit-circuitpython-neopixel>=3.3.4
+Adafruit-GPIO>=1.0.3
+Adafruit-PureIO>=0.2.3
 dateparser==0.7.0
 Pillow==5.3.0
 pytz==2018.7
