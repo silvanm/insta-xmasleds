@@ -44,5 +44,8 @@ For a better effect I inserted the strip into a pump tube for pools I found [her
 
 ## To run
 
-The whole logic is within the Python3 script `animate-live.py`.
-  
+The whole logic is within the Python3 script `animate-live.py`. Use `requirements.txt`to 
+install the dependencies.
+
+There is also a webserver which serves a live view of the currently displayed image. Use 
+`Dockerfile` to build a container. It will contact the webserver on the Raspberry Pi.

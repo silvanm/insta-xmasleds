@@ -15,6 +15,8 @@ import platform
 import pytz
 import requests
 import dateparser
+import time
+import json
 from math import floor, ceil, sin, cos, pi
 
 # The number of NeoPixels
@@ -28,10 +30,10 @@ ANIMATION_DELAY = 0
 # Ratio of height to width
 HEIGHT_TO_WIDTH = 3
 
-BLUR_PIXELS=2
+BLUR_PIXELS = 2
 
 # Reduce saturation. 1 = no reduction
-COLOR_LEVEL=1
+COLOR_LEVEL = 1
 
 # The number of rows the both images overlap
 OVERLAP_ROWS = 50
@@ -67,6 +69,7 @@ if platform.system() != 'Darwin':
 else:
     # Running on local machine
     import fakeneopixel
+
     pixels = fakeneopixel.NeoPixel(num_pixels=NUM_PIXELS)
 
 # Switch to the current dir
@@ -79,7 +82,8 @@ class XmasImage():
         img = Image.open(BytesIO(bytes))
         image = img.resize((NUM_PIXELS - BLACK_OFFSET, NUM_PIXELS - BLACK_OFFSET), resample=Image.BICUBIC)
         image = image.filter(ImageFilter.GaussianBlur(radius=BLUR_PIXELS))
-        image = image.resize((NUM_PIXELS - BLACK_OFFSET, HEIGHT_TO_WIDTH * NUM_PIXELS - BLACK_OFFSET), resample=Image.BICUBIC)
+        image = image.resize((NUM_PIXELS - BLACK_OFFSET, HEIGHT_TO_WIDTH * NUM_PIXELS),
+                             resample=Image.BICUBIC)
 
         # Desaturate
         converter = ImageEnhance.Color(image)
@@ -183,7 +187,7 @@ def get_row_using_crossfade(y):
     global current_image, prev_image
 
     row = current_image.get_row(y)
-    #print("imag_index=%d, pos=%d" % (image_index, y), end="\r")
+    # print("imag_index=%d, pos=%d" % (image_index, y), end="\r")
     if y >= OVERLAP_ROWS or prev_image is None:
         # no overlap
         pass
@@ -192,12 +196,14 @@ def get_row_using_crossfade(y):
         row = current_image.get_row(y)
         prev_row = prev_image.get_row(NUM_PIXELS * HEIGHT_TO_WIDTH - OVERLAP_ROWS + y)
         for x in range(0, NUM_PIXELS):
+            new_color_tuple = [0, 0, 0]
             for channel in range(0, 3):
-                row[x][channel] = int(
+                new_color_tuple[channel] = int(
                     (1 - y / OVERLAP_ROWS) * prev_row[x][channel]) \
-                                  + int((y / OVERLAP_ROWS) * row[x][channel])
+                                           + int((y / OVERLAP_ROWS) * row[x][channel])
 
                 assert row[x][channel] >= 0 and row[x][channel] < 256
+            row[x] = tuple(new_color_tuple)
     return row
 
 
@@ -207,6 +213,8 @@ def display_image():
     # Start with a random image
     current_image_index = 0
     lights_on = True
+    last_stats = None
+
     while True:
         # Getting a new image. Previous images is kept for crossfade effect
         prev_image = current_image
@@ -217,11 +225,23 @@ def display_image():
         if is_night is not None:
             lights_on = is_night
 
+        current_image_name = current_image.name
+
         if datetime.now().hour < 6:
             log("turn off between 0 AM and 6 AM")
             lights_on = False
+            current_image_name = ''
+
+        if last_stats is not None:
+            with open('current_image_stats.json', 'w') as f:
+                last_stats['image_name'] = current_image_name
+                f.write(json.dumps(last_stats))
 
         log("Current image displayed %s" % current_image.name)
+        last_stats = {
+            'timestamp_start': time.time(),
+            'timestamp_end': None,
+        }
         for y in range(0, NUM_PIXELS * HEIGHT_TO_WIDTH - OVERLAP_ROWS):
             row = get_row_using_crossfade(y)
             for index, val in enumerate(row):
@@ -233,20 +253,23 @@ def display_image():
             pixels.show()
             time.sleep(ANIMATION_DELAY)
         current_image_index = (current_image_index + 1) % len(images)
+        last_stats['timestamp_end'] = time.time()
 
 
 def test():
     log("Run test.")
     for x in range(0, NUM_PIXELS):
-        pixels[x] = 0
+        pixels[x] = (0, 0, 0)
 
     for x in range(BLACK_OFFSET, NUM_PIXELS):
         i = x / 255 * pi * 5
         level = x / NUM_PIXELS * 255
-        pixels[x] = (int((sin(i) + 1)/2 * level), int((cos(i * 2) + 1)/2 * level), int((sin(i * 3) + 1)/2 * level))
+        pixels[x] = (
+            int((sin(i) + 1) / 2 * level), int((cos(i * 2) + 1) / 2 * level), int((sin(i * 3) + 1) / 2 * level))
         pixels.show()
 
-#while True:
+
+# while True:
 test()
 check_is_night_via_webservice()
 display_image()

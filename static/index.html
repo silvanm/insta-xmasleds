@@ -1,0 +1,79 @@
+<html>
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-10357230-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {dataLayer.push(arguments);}
+
+      gtag('js', new Date());
+
+      gtag('config', 'UA-10357230-9');
+    </script>
+
+    <meta name=viewport content="width=550">
+    <meta property=og:image content="http://xmaslights.muehlemann.com/static/og-image.jpg">
+    <meta property=og:title content="Instagram driven Christmas lights">
+    <meta property=og:description
+          content="Live view of how the christmas lights on my terrace are being driven by the hashtag #christmas.">
+    <meta property=og:url content=http://xmaslights.muehlemann.com>
+    <meta property=og:image:type content=image/jpeg>
+    <meta property=og:image:width content=977>
+    <meta property=og:image:height content=484>
+    <meta property=og:type content="website"/>
+    <meta name=robots content=index,follow>
+    <meta name=description
+          content="Live view of how the christmas lights on my terrace are being driven">
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js"></script>
+    <title>Instagram driven Christmas lights</title>
+</head>
+<body>
+<h1>Instagram driven Christmas lights</h1>
+
+<div id="intro">
+    <div id="teaser">
+        <p>It's Christmas time and every homeowner decorates his house blinking lights...
+            <span id="more">more</span>
+        </p>
+    </div>
+    <div id="info">
+        <p>
+            I am also one of them. But I wanted to add a pinch of IoT and scoop of art to my installation.
+            It pulls images with the
+            hashtag #christmas from Instagram
+            and uses them to light up the RGB-LEDs which are attached to our terrace. This visualization is a live view
+            of the image which is currently shown.</p>
+    </div>
+</div>
+
+<div id="container-holder">
+    <div class="main-container">
+        <h2>Source Image from Instagram</h2>
+        <canvas id="viewport" class="hidden"></canvas>
+        <p>The highlighted row is used to drive the LEDs.</p>
+    </div>
+    <div class="main-container">
+        <h2>3D Rendering of how it looks on the terrace</h2>
+        <canvas id="three"></canvas>
+        <p>Touch to zoom and pan.</p>
+    </div>
+    <div class="main-container">
+        <h2>Picture from the street</h2>
+        <img src="/static/from_the_street-square.jpg">
+    </div>
+    <div class="main-container">
+        <h2>Close-up</h2>
+        <img src="/static/insta-xmasleds-square.gif">
+    </div>
+</div>
+
+<div>
+    <p id="debug-mode"><span>Show stats</span> - <a target="_blank" href="https://github.com/silvanm/insta-xmasleds">Source</a>
+    </p>
+</div>
+<script type="module" src="/static/bundle.js"></script>
+</body>
+</html>

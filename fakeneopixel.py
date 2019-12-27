@@ -1,6 +1,7 @@
 """ Simulates the NeoPixel as image for local debugging """
 
 from PIL import Image
+import time
 
 IMAGE_HEIGHT = 1000
 
@@ -21,13 +22,14 @@ class NeoPixel:
         self.buffer[key] = value
 
     def show(self):
+        time.sleep(0.01)
         for x in range(0, self.num_pixels):
 
             self.image.putpixel((x, self.y), self.buffer[x])
 
         self.y += 1
         if self.y >= IMAGE_HEIGHT:
-            self.save("image_%d.jpg" % self.image_index)
+            self.save("/tmp/image_%d.jpg" % self.image_index)
             self.image_index += 1
             self.reset()
 

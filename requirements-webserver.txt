@@ -1,0 +1,11 @@
+dateparser==0.7.0
+Pillow==5
+pytz==2018.7
+regex==2018.11.22
+requests==2.20.1
+spidev==3.2
+tzlocal==1.5.1
+urllib3
+uvicorn
+starlette
+aiofiles
