@@ -5,7 +5,7 @@ regex==2018.11.22
 requests==2.20.1
 spidev==3.2
 tzlocal==1.5.1
-urllib3
+urllib3>=1.24.2
 uvicorn
 starlette
 aiofiles

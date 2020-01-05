@@ -230,8 +230,7 @@ def display_image():
         if datetime.now().hour < 6:
             log("turn off between 0 AM and 6 AM")
             lights_on = False
-            current_image_name = ''
-
+            
         if last_stats is not None:
             with open('current_image_stats.json', 'w') as f:
                 last_stats['image_name'] = current_image_name
