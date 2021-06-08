@@ -3,7 +3,7 @@ adafruit-circuitpython-neopixel>=3.3.4
 Adafruit-GPIO>=1.0.3
 Adafruit-PureIO>=0.2.3
 dateparser==0.7.0
-Pillow==5
+Pillow==8.2.0
 pytz==2018.7
 regex==2018.11.22
 requests==2.20.1
