@@ -1,12 +1,10 @@
 #!/usr/bin/python3
 
 """
-Version fetching images directly via Instagram (using the proxy at
-http://instagram-images-silvan-privat.appuioapp.ch/fetch?url=https://www.instagram.com/explore/tags/christmas/
+Version fetching images directly from Unsplash
 """
 
 import os
-import time
 from datetime import datetime, timedelta
 from PIL import Image, ImageFilter, ImageEnhance, ImageOps
 from io import BytesIO
@@ -19,7 +17,10 @@ import time
 import json
 from math import floor, ceil, sin, cos, pi
 
+CLIENT_ID=os.environ['CLIENT_ID']
+
 # The number of NeoPixels
+SAMPLE_IMAGES_JSON = 'static/sample_images.json'
 NUM_PIXELS = 780
 
 # The number of Pixels to have black at the beginning
@@ -125,14 +126,24 @@ def get_next_url():
         while not done:
             print("Fetching new URLs")
             r = requests.get(
-                'http://instagram-images-silvan-privat.appuioapp.ch/fetch?url=https://www.instagram.com/explore/tags/christmas/')
+                'https://api.unsplash.com/photos/random/?topic=christmas&count=20&client_id=' + CLIENT_ID
+            )
             if r.status_code == 200:
-                urls.extend(r.json())
+                urllist = [i['urls']['regular'] for i in r.json()]
+                urls.extend(urllist)
                 if len(urls) > 0:
                     print("%d urls collected" % len(urls))
+                    if not os.path.isfile(SAMPLE_IMAGES_JSON):
+                        with open(SAMPLE_IMAGES_JSON, 'w') as outfile:
+                            json.dump(urllist, outfile)
+                            print(f"Saving list to {SAMPLE_IMAGES_JSON}")
                     done = True
                 else:
-                    print("Service provided 0 URLs")
+                    print("Service provided 0 URLs falling back to static URL list")
+                    with open(SAMPLE_IMAGES_JSON, 'r') as f:
+                        urls = json.load(f)
+                    done=True
+                    break
             else:
                 print("Connection error. Status %s" % r.status_code)
     else:
@@ -214,6 +225,8 @@ def display_image():
     current_image_index = 0
     lights_on = True
     last_stats = None
+    # The first time it always shows the image for test purposes
+    first_pass = True
 
     while True:
         # Getting a new image. Previous images is kept for crossfade effect
@@ -222,7 +235,7 @@ def display_image():
 
         # Turn the lights on?
         is_night = check_is_night_via_webservice()
-        if is_night is not None:
+        if is_night:
             lights_on = is_night
 
         current_image_name = current_image.name
@@ -230,7 +243,12 @@ def display_image():
         if datetime.now().hour < 6:
             log("turn off between 0 AM and 6 AM")
             lights_on = False
-            
+
+        if first_pass:
+            print("First pass. Ignoring day/night")
+            lights_on = True
+            first_pass = False
+
         if last_stats is not None:
             with open('current_image_stats.json', 'w') as f:
                 last_stats['image_name'] = current_image_name
@@ -267,8 +285,6 @@ def test():
             int((sin(i) + 1) / 2 * level), int((cos(i * 2) + 1) / 2 * level), int((sin(i * 3) + 1) / 2 * level))
         pixels.show()
 
-
-# while True:
 test()
 check_is_night_via_webservice()
 display_image()
