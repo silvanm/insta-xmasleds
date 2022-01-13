@@ -1,5 +1,5 @@
 dateparser==0.7.0
-Pillow==5
+Pillow==9.0.0
 pytz==2018.7
 regex==2018.11.22
 requests==2.20.1
